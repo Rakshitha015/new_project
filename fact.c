@@ -13,7 +13,8 @@ int main() {
         for (i = 1; i <= n; ++i) {
             fact *= i+k;
         }
-        printf("Factorial of %d = %llu", n, fact);
+    
+       printf("added\n");
     }
 
     return 0;
