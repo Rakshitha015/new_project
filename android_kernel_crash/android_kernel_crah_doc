@@ -1,0 +1,118 @@
+
+
+android kernel crash using command:
+
+open aosp(not android_kernel).
+source build/envsetup.h
+lunch
+72
+emulator
+open another terminal
+enter adb shell
+to enable the Magic SysRq key functionality " echo 1 > /proc/sys/kernel/sysrq "
+to perform crash " echo c > /proc/sysrq-trigger " (in adb shell)
+to see logs " cat /sys/fs/pstore " (it has three files)(in adb shell).
+
+
+<----------------------------------------------------------------------------------------------->
+
+android kernel crash using programm:
+
+//android kernel
+open android_kernel
+cd /common/drivers/
+create one directory using mkdir rakshitha_kernel
+Inside rakshitha_kernel directory create three file named as Makefile,Kconfig, .c(kernel_crash1.c) file
+write inside of Makefile:
+obj-$(CONFIG_KERNEL_CRASH1) += kernel_crash1.o
+
+write inside of Kconfig:
+# Invcase Device configuration
+ 
+menuconfig KERNEL_CRASH1
+    tristate "Inverse Characters Case"
+    default y
+    help
+      Say Y to include this module
+      Say N will not build this module
+      Say M to build this module but not include to kernel yet
+      
+kernel program in .c file
+      
+inside common/drivers directory open Kconfig and add source "drivers/rakshitha_kernel/Kconfig" and open Makefile add Obj-$(CONFIG_KERNEL_CRASH) +=rakshitha_kernel/.
+
+
+come back to android kernerl:
+
+check it in menuconfig:
+use this command ticheck it in menuconfig:
+BUILD_CONFIG=common/build.config.gki.x86_64 \
+build/config.sh
+
+to build images and to geneate bzImage:
+BUILD_CONFIG=common/build.config.gki.x86_64 \
+LTO=none \
+FAST_BUILD=1 \
+SKIP_MRPROPER=1 \
+SKIP_DEFCONFIG=1 \
+build/config.sh
+
+
+
+//aosp
+go to aosp:
+source build/envsetup.sh
+lunch 72
+m all -j16
+emulator
+
+open another terminal
+
+enter adb shell
+
+check whether device is created or not
+cd /dev/
+mydevice10 will be present
+
+come back to aosp:  --> to run userspace programm.cd 
+cd /u/aosp/external
+create one directory for userspace programm:  kerner_crash_usedir
+inside here create two files name as Android.mk and kernel_crash_user.c(user)
+inside Android.mk:
+LOCAL_PATH := $(call my-dir)
+	include $(CLEAR_VARS)
+	#give module name
+	LOCAL_MODULE := kernel_crash_user_binary
+	#list your c files to complete
+	LOCAL_SRC_FILES := kernel_crash_user.c
+	include $(BUILD_EXECUTABLE)
+	
+come back to aosp:
+cd /u/aosp
+source build/envserup.sh
+lunch 72
+mmma external/kernel_crash_userdir
+emulator
+
+open another terminal
+cd /u/aosp:
+adb push /u/aosp13_45/out/target/product/emulator_x86_64/system/bin/kernel_crash_user_binary /data/local/tmp
+adb shell
+
+check inside of cd /data/local/tmp
+execute file : ./kernel_crash_user_binary
+give value 1 to crash the kernel...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
